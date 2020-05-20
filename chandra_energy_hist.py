@@ -1,6 +1,6 @@
 import glob
 from astropy.io import fits
-from test import make_hist
+from data_functions import make_hist
 
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data"
