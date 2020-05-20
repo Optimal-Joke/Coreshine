@@ -1,22 +1,31 @@
+import glob
 from astropy.io import fits
 from astropy.table import Table
 import numpy as np
 import matplotlib.pyplot as plt
 
-image_file = input("filepath:")
+
+data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data"
+
+chandra_evt2_files = glob.glob(
+    f"{data_dir}/**/Chandra/**/*evt2.fits", recursive=True)
 
 
-hdu_list = fits.open(image_file, memmap=True)
-evt_data = Table(hdu_list[1].data)
+def make_hist(filepath, min_e, max_e, nbins='auto'):
+    evt_data = fits.getdata(filepath)
+    energy = evt_data["energy"]
+    min_thresh = evt_data["energy"] >= min_e
+    max_thresh = evt_data["energy"] < max_e
+    e_band = energy[np.logical_and(min_thresh, max_thresh)]
+    plt.hist(e_band, bins=nbins)
+    plt.title("Test")
+    plt.xlabel("Energy (eV)")
+    plt.ylabel("Count")
+    plt.savefig(f"energy_hist_{min_e}_{max_e}_{i}", format="png")
+    plt.close()
 
 
-bins = input("nbins=")
-try:
-    NBINS = int(bins)
-except ValueError:
-    NBINS = "auto"
-
-energy_hist = plt.hist(evt_data['energy'], bins=NBINS)
-plt.xlabel("Energy (eV)")
-plt.ylabel("Count")
-plt.show()
+i = 1
+for file in chandra_evt2_files:
+    make_hist(file, 0, 1000)
+    i += 1
