@@ -1,0 +1,69 @@
+import os
+from astropy.io import fits
+import numpy as np
+import matplotlib.pyplot as plt
+
+data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
+
+objects = {}
+for entry in os.scandir(data_dir):
+    if not entry.name.startswith('.') and entry.is_dir():
+        objects[entry.name] = entry.path
+
+
+class Chandra:
+    """
+    """
+
+    def __init__(self, obj_name):
+        obj_path = objects[obj_name]
+        telescopes = []
+        for telescope in os.scandir(obj_path):
+            if telescope.is_dir() and "." not in telescope.name:
+                telescopes.append(telescope.name)
+        if not "Chandra" in telescopes:
+            message = f"{obj_name} has no data from Chandra telescope."
+            print(message)
+        else:
+            self.obj_name = obj_name
+            self.obj_path = obj_path
+            self.telescopes = telescopes
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+class Spitzer:
+    """
+    """
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+class XMM:
+    """
+    """
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+class Rosat:
+    """
+    """
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+class Swift:
+    """
+    """
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+instance = Chandra("L1228")
+print(instance.obj_path)
