@@ -5,14 +5,22 @@ import matplotlib.pyplot as plt
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
 
-sample = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data/L1517/Chandra/primary/acisf03755N004_evt2.fits"
+chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits"
 
-actions_to_filepath = {}
+xmm_sample = f"{data_dir}/B59/XMM/PPS/P0206610101PNS003PIEVLI0000.FTZ"
 
 objects = {}
 for entry in os.scandir(data_dir):
     if not entry.name.startswith('.') and entry.is_dir():
         objects[entry.name] = entry.path
+
+
+class Spitzer:
+    """
+    """
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
 
 
 class Chandra:
@@ -37,7 +45,7 @@ class Chandra:
         if not "Chandra" in self.telescopes:
             self.init_message = f"{self.objectname} has no data from Chandra telescope."
         else:
-            self.init_message = "Data initiated."
+            self.init_message = "Chandra data initiated."
         print(self.init_message)
 
     def get_objectname(self):
@@ -49,24 +57,80 @@ class Chandra:
     def get_telescopes(self):
         return self.telescopes
 
-    def e_hist(self, min_e, max_e, nbins='auto'):
-        pass
-
-
-class Spitzer:
-    """
-    """
-
-    def e_hist(self, min_e, max_e, nbins='auto'):
-        pass
+    def e_hist(self, min_e, max_e, nbins='auto', save=False):
+        """ Makes a histogram over the specified range of energies. Optionally saves output as PNG in the current directory.
+        """
+        evt_data = fits.getdata(self.path)
+        energy = evt_data["energy"]
+        min_thresh = evt_data["energy"] >= min_e
+        max_thresh = evt_data["energy"] < max_e
+        e_band = energy[min_thresh & max_thresh]
+        plt.hist(e_band, bins=nbins)
+        plt.title(
+            f"Energy Distribution for {self.objectname} between {min_e} and {max_e} eV")
+        plt.xlabel("Energy (eV)")
+        plt.ylabel("Count")
+        if save == True:
+            plt.savefig(
+                f"{self.objectname}_ehist_{min_e}-{max_e}eV.png", dpi=250, format="png")
+            print(f"Histogram saved to {os.getcwd()}.")
+        else:
+            plt.show()
 
 
 class XMM:
-    """
+    """Takes a file path or name as input. As of now, this class can only initiate data and yield energy histogram.
     """
 
-    def e_hist(self, min_e, max_e, nbins='auto'):
-        pass
+    def __init__(self, file):
+        if os.path.isfile(file):
+            self.path = file
+        else:
+            for path, dir, files in os.walk(f"{data_dir}"):
+                if file in files:
+                    self.path = os.path.join(path, file)
+        for item in objects.keys():
+            if item in self.path:
+                self.objectname = item
+        obj_path = objects[self.objectname]
+        self.telescopes = []
+        for telescope in os.scandir(obj_path):
+            if telescope.is_dir() and "." not in telescope.name:
+                self.telescopes.append(telescope.name)
+        if not "XMM" in self.telescopes:
+            self.init_message = f"{self.objectname} has no data from the XMM-Newton telescope."
+        else:
+            self.init_message = "XMM-Newton data initiated."
+        print(self.init_message)
+
+    def get_objectname(self):
+        return self.objectname
+
+    def get_filepath(self):
+        return self.path
+
+    def get_telescopes(self):
+        return self.telescopes
+
+    def e_hist(self, min_e, max_e, nbins='auto', save=False):
+        """ Makes a histogram over the specified range of energies. Optionally saves output as PNG in the current directory.
+        """
+        evt_data = fits.getdata(self.path)
+        energy = evt_data["PI"]
+        min_thresh = evt_data["PI"] >= min_e
+        max_thresh = evt_data["PI"] < max_e
+        e_band = energy[min_thresh & max_thresh]
+        plt.hist(e_band, bins=nbins)
+        plt.title(
+            f"Energy Distribution for {self.objectname} between {min_e} and {max_e} eV")
+        plt.xlabel("Energy (eV)")
+        plt.ylabel("Count")
+        if save == True:
+            plt.savefig(
+                f"{self.objectname}_ehist_{min_e}-{max_e}eV.png", dpi=250, format="png")
+            print(f"Histogram saved to {os.getcwd()}.")
+        else:
+            plt.show()
 
 
 class Rosat:
@@ -83,3 +147,7 @@ class Swift:
 
     def e_hist(self, min_e, max_e, nbins='auto'):
         pass
+
+
+instance1 = XMM(xmm_sample)
+instance1.e_hist(783, 15032)
