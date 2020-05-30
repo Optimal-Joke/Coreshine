@@ -5,29 +5,49 @@ import matplotlib.pyplot as plt
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
 
+sample = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data/L1517/Chandra/primary/acisf03755N004_evt2.fits"
+
+actions_to_filepath = {}
+
 objects = {}
 for entry in os.scandir(data_dir):
     if not entry.name.startswith('.') and entry.is_dir():
         objects[entry.name] = entry.path
 
 
-class Chandra:
-    """
+class betterChandra:
+    """Takes a file path or name as input. As of now, this class can only initiate data and yield energy histogram.
     """
 
-    def __init__(self, obj_name):
-        obj_path = objects[obj_name]
-        telescopes = []
+    def __init__(self, file):
+        if os.path.isfile(file):
+            self.path = file
+        else:
+            for path, dir, files in os.walk(f"{data_dir}"):
+                if file in files:
+                    self.path = os.path.join(path, file)
+        for item in objects.keys():
+            if item in self.path:
+                self.objectname = item
+        obj_path = objects[self.objectname]
+        self.telescopes = []
         for telescope in os.scandir(obj_path):
             if telescope.is_dir() and "." not in telescope.name:
-                telescopes.append(telescope.name)
-        if not "Chandra" in telescopes:
-            message = f"{obj_name} has no data from Chandra telescope."
-            print(message)
+                self.telescopes.append(telescope.name)
+        if not "Chandra" in self.telescopes:
+            self.init_message = f"{self.objectname} has no data from Chandra telescope."
         else:
-            self.obj_name = obj_name
-            self.obj_path = obj_path
-            self.telescopes = telescopes
+            self.init_message = "Data initiated."
+        print(self.init_message)
+
+    def get_objectname(self):
+        return self.objectname
+
+    def get_filepath(self):
+        return self.path
+
+    def get_telescopes(self):
+        return self.telescopes
 
     def e_hist(self, min_e, max_e, nbins='auto'):
         pass
@@ -63,7 +83,3 @@ class Swift:
 
     def e_hist(self, min_e, max_e, nbins='auto'):
         pass
-
-
-instance = Chandra("L1228")
-print(instance.obj_path)
