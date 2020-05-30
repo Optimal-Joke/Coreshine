@@ -15,7 +15,7 @@ for entry in os.scandir(data_dir):
         objects[entry.name] = entry.path
 
 
-class betterChandra:
+class Chandra:
     """Takes a file path or name as input. As of now, this class can only initiate data and yield energy histogram.
     """
 
