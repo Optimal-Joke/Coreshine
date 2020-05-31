@@ -49,12 +49,18 @@ class Chandra:
         print(self.init_message)
 
     def get_objectname(self):
+        """Returns the name of the object.
+        """
         return self.objectname
 
     def get_filepath(self):
+        """Returns the filepath of the current datafile.
+        """
         return self.path
 
     def get_telescopes(self):
+        """Returns the telescopes that have data for the object in question.
+        """
         return self.telescopes
 
     def e_hist(self, min_e, max_e, nbins='auto', save=False):
@@ -67,7 +73,7 @@ class Chandra:
         e_band = energy[min_thresh & max_thresh]
         plt.hist(e_band, bins=nbins)
         plt.title(
-            f"Energy Distribution for {self.objectname} between {min_e} and {max_e} eV")
+            f"{self.objectname} Energy Distribution | {min_e}—{max_e} eV")
         plt.xlabel("Energy (eV)")
         plt.ylabel("Count")
         if save == True:
@@ -76,6 +82,9 @@ class Chandra:
             print(f"Histogram saved to {os.getcwd()}.")
         else:
             plt.show()
+
+    def e_mask(self, min_e, max_e, inplace=False):
+        pass
 
 
 class XMM:
@@ -104,15 +113,21 @@ class XMM:
         print(self.init_message)
 
     def get_objectname(self):
+        """Returns the name of the object.
+        """
         return self.objectname
 
     def get_filepath(self):
+        """Returns the filepath of the current datafile.
+        """
         return self.path
 
     def get_telescopes(self):
+        """Returns the telescopes that have data for the object in question.
+        """
         return self.telescopes
 
-    def e_hist(self, min_e, max_e, nbins='auto', save=False):
+    def e_hist(self, min_e=0, max_e=float("inf"), nbins='auto', save=False):
         """ Makes a histogram over the specified range of energies. Optionally saves output as PNG in the current directory.
         """
         evt_data = fits.getdata(self.path)
@@ -122,7 +137,7 @@ class XMM:
         e_band = energy[min_thresh & max_thresh]
         plt.hist(e_band, bins=nbins)
         plt.title(
-            f"Energy Distribution for {self.objectname} between {min_e} and {max_e} eV")
+            f"{self.objectname} Energy Distribution | {min_e}—{max_e} eV")
         plt.xlabel("Energy (eV)")
         plt.ylabel("Count")
         if save == True:
@@ -131,6 +146,15 @@ class XMM:
             print(f"Histogram saved to {os.getcwd()}.")
         else:
             plt.show()
+
+    def e_mask(self, min_e=0, max_e=float("inf"), inplace=False):
+        evt_data = fits.getdata(self.path)
+        energy = evt_data["PI"]
+        min_thresh = evt_data["PI"] >= min_e
+        max_thresh = evt_data["PI"] < max_e
+        e_mask = energy[min_thresh & max_thresh]
+        return e_mask
+        # # evt_table.data = evt_table.data[coord_mask]
 
 
 class Rosat:
@@ -149,5 +173,6 @@ class Swift:
         pass
 
 
-instance1 = XMM(xmm_sample)
-instance1.e_hist(783, 15032)
+instance1 = XMM("P0206610101PNS003PIEVLI0000.FTZ")
+instance1.e_mask(max_e=800)
+instance1.e_hist()

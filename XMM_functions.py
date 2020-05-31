@@ -11,7 +11,7 @@ def make_hist(obj_name, filepath, min_e, max_e, nbins='auto', i=None):
     e_band = energy[min_thresh & max_thresh]
     plt.hist(e_band, bins=nbins)
     plt.title(
-        f"Energy Distribution for {obj_name} between {min_e} and {max_e} eV")
+        f"{obj_name} Energy Distribution | {min_e} and {max_e} eV")
     plt.xlabel("Energy (eV)")
     plt.ylabel("Count")
     plt.show()
