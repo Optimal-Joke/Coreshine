@@ -5,10 +5,6 @@ import matplotlib.pyplot as plt
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
 
-chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits"
-
-xmm_sample = f"{data_dir}/B59/XMM/PPS/P0206610101PNS003PIEVLI0000.FTZ"
-
 objects = {}
 for entry in os.scandir(data_dir):
     if not entry.name.startswith('.') and entry.is_dir():
@@ -24,7 +20,7 @@ class Spitzer:
 
 
 class Chandra:
-    """Takes a file path or name as input. As of now, this class can only initiate data and yield energy histogram.
+    """Takes a file path or name as input. As of now, this class can only initiate data, yield energy histograms, and apply energy masks.
     """
 
     def __init__(self, file):
@@ -88,7 +84,7 @@ class Chandra:
 
 
 class XMM:
-    """Takes a file path or name as input. As of now, this class can only initiate data and yield energy histogram.
+    """Takes a file path or name as input. As of now, this class can only initiate data, yield energy histograms, and apply energy masks.
     """
 
     def __init__(self, file):
@@ -154,7 +150,6 @@ class XMM:
         max_thresh = evt_data["PI"] < max_e
         e_mask = energy[min_thresh & max_thresh]
         return e_mask
-        # # evt_table.data = evt_table.data[coord_mask]
 
 
 class Rosat:
@@ -171,8 +166,3 @@ class Swift:
 
     def e_hist(self, min_e, max_e, nbins='auto'):
         pass
-
-
-instance1 = XMM("P0206610101PNS003PIEVLI0000.FTZ")
-instance1.e_mask(max_e=800)
-instance1.e_hist()
