@@ -13,18 +13,7 @@ for entry in os.scandir(data_dir):
         objects[entry.name] = entry.path
 
 
-class Spitzer:
-    """
-    """
-
-    def e_hist(self, min_e, max_e, nbins='auto'):
-        pass
-
-
-class Chandra:
-    """Takes a file path or name as input. As of now, this class can only initiate data, yield energy histograms, and apply energy masks.
-    """
-
+class Telescope:
     def __init__(self, file):
         if os.path.isfile(file):  # Assign input to filepath
             self.path = file
@@ -43,14 +32,6 @@ class Chandra:
             if telescope.is_dir() and "." not in telescope.name:
                 # List telescopes with object data.
                 self.telescopes.append(telescope.name)
-        if not "Chandra" in self.telescopes:
-            self.init_message = f"{self.objectname} has no data from Chandra telescope."
-        else:
-            self.init_message = "Chandra data initiated."
-        print(self.init_message)
-
-    def __repr__(self):
-        return f"Chandra object from path {self.path}"
 
     def get_objectname(self):
         """Returns the name of the object.
@@ -66,6 +47,43 @@ class Chandra:
         """Returns the telescopes that have data for the object in question.
         """
         return self.telescopes
+
+
+class Spitzer(Telescope):
+    """
+    """
+
+    def __init__(self, file):
+        self.telescope = "Spitzer"
+        super().__init__(file)
+        if not self.telescope in self.telescopes:
+            init_message = f"{self.objectname} has no data from {self.telescope} telescope."
+        else:
+            init_message = f"{self.telescope} data initiated."
+        print(init_message)
+
+    def __repr__(self):
+        return f"{self.telescope} object from path {self.path}"
+
+    def e_hist(self, min_e, max_e, nbins='auto'):
+        pass
+
+
+class Chandra(Telescope):
+    """Takes a file path or name as input. As of now, this class can only initiate data, yield energy histograms, and apply energy masks.
+    """
+
+    def __init__(self, file):
+        self.telescope = "Chandra"
+        super().__init__(file)
+        if not self.telescope in self.telescopes:
+            init_message = f"{self.objectname} has no data from {self.telescope} telescope."
+        else:
+            init_message = f"{self.telescope} data initiated."
+        print(init_message)
+
+    def __repr__(self):
+        return f"{self.telescope} object from path {self.path}"
 
     def e_hist(self, min_e=0, max_e=float("inf"), e_list=None, nbins='auto', save=False):
         """ Makes a histogram over the specified range of energies. Optionally saves output as PNG in the current directory.
@@ -101,52 +119,26 @@ class Chandra:
             max_thresh = evt_data["energy"] < max_e
             e_mask = energy[min_thresh & max_thresh]
             return e_mask
+        # TODO: Add what to do if inplace=True.
         else:
             pass
 
 
-class XMM:
+class XMM(Telescope):
     """Takes a file path or name as input. As of now, this class can only initiate data, yield energy histograms, and apply energy masks.
     """
 
     def __init__(self, file):
-        if os.path.isfile(file):
-            self.path = file
+        self.telescope = "XMM"
+        super().__init__(file)
+        if not self.telescope in self.telescopes:
+            init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            for path, _dir, files in os.walk(f"{data_dir}"):
-                if file in files:
-                    self.path = os.path.join(path, file)
-        for item in objects.keys():
-            if item in self.path:
-                self.objectname = item
-        obj_path = objects[self.objectname]
-        self.telescopes = []
-        for telescope in os.scandir(obj_path):
-            if telescope.is_dir() and "." not in telescope.name:
-                self.telescopes.append(telescope.name)
-        if not "XMM" in self.telescopes:
-            self.init_message = f"{self.objectname} has no data from the XMM-Newton telescope."
-        else:
-            self.init_message = "XMM-Newton data initiated."
-        print(self.init_message)
+            init_message = f"{self.telescope} data initiated."
+        print(init_message)
 
     def __repr__(self):
-        return f"XMM object from path {self.path}"
-
-    def get_objectname(self):
-        """Returns the name of the object.
-        """
-        return self.objectname
-
-    def get_filepath(self):
-        """Returns the filepath of the current datafile.
-        """
-        return self.path
-
-    def get_telescopes(self):
-        """Returns the telescopes that have data for the object in question.
-        """
-        return self.telescopes
+        return f"{self.telescope} object from path {self.path}"
 
     def e_hist(self, min_e=0, max_e=float("inf"), e_list=None, nbins='auto', save=False):
         """ Makes a histogram over the specified range of energies. Optionally saves output as PNG in the current directory.
@@ -182,35 +174,46 @@ class XMM:
             max_thresh = evt_data["PI"] < max_e
             e_mask = energy[min_thresh & max_thresh]
             return e_mask
+        # TODO: Add what to do if inplace=True.
         else:
             pass
 
 
-class Rosat:
+class Rosat(Telescope):
     """
     """
 
     def __init__(self, file):
-        pass
+        self.telescope = "Rosat"
+        super().__init__(file)
+        if not self.telescope in self.telescopes:
+            init_message = f"{self.objectname} has no data from {self.telescope} telescope."
+        else:
+            init_message = f"{self.telescope} data initiated."
+        print(init_message)
 
     def __repr__(self):
-        # return f"Rosat object from path {self.path}"
-        pass
+        return f"{self.telescope} object from path {self.path}"
 
     def e_hist(self, min_e=0, max_e=float("inf"), nbins='auto', save=False):
         pass
 
 
-class Swift:
+class Swift(Telescope):
     """
     """
 
     def __init__(self, file):
-        pass
+        self.telescope = "Swift"
+        super().__init__(file)
+        if not self.telescope in self.telescopes:
+            init_message = f"{self.objectname} has no data from {self.telescope} telescope."
+        else:
+            init_message = f"{self.telescope} data initiated."
+        print(init_message)
 
     def __repr__(self):
-        # return f"Swift object from path {self.path}"
-        pass
+        return f"{self.telescope} object from path {self.path}"
 
     def e_hist(self, min_e=0, max_e=float("inf"), nbins='auto', save=False):
         pass
