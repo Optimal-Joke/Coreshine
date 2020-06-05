@@ -10,12 +10,13 @@ chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits"
 
 xmm_sample = f"{data_dir}/B59/XMM/PPS/P0206610101PNS003PIEVLI0000.FTZ"
 
-# sample = Chandra(chandra_sample)
-# sample.e_mask([600, 2000], [4000, 6000], newfile=True, filename="test.fits")
-# sample.e_mask([6000, 10000], [14000], newfile=True, filename="test1.fits")
+chandra = Chandra(chandra_sample)
+chandra2 = Chandra(
+    "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data/L1448/Chandra/primary/acisf04497N003_evt2.fits")
+energies = chandra.e_mask()
+energies2 = chandra2.e_mask()
+chandra.e_hist(e_list=energies, e_list2=energies2, nbins=400, save=True,
+               object="L1517 & L1448", filename="ehist2.png")
 
-test = Chandra(test)
-test1 = Chandra(test1)
-
-test.e_hist(object="L1517", nbins=200, save=True)
-test1.e_hist(nbins=200, save=True)
+# xmm = XMM(xmm_sample)
+# print(xmm.file_dir)
