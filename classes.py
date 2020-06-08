@@ -178,6 +178,30 @@ class Chandra(Telescope):
                     print(
                         f"""A file with the name {filename} already exists in {os.getcwd()}\nPlease use the \"filename\" parameter to give it another name""")
 
+    def coord_mask(self, center_RA, center_Dec, shape="box", size_RA=None, size_Dec=None, radius=None, radius_RA=None, radius_Dec=None, rotation=None, save=False):
+        """All coordinates should be given in detector coordinates.
+        """
+        evt_data = fits.getdata(self.path)  # Get event data from file
+        ra = evt_data["x"]  # Get RA coordinates from event data
+        dec = evt_data["y"]  # Get Dec coordinates from event data
+        if shape == "box":
+            half_size_RA, half_size_Dec = size_RA/2, size_Dec/2
+            min_RA, max_RA = center_RA-half_size_RA, center_RA+half_size_RA
+            min_Dec, max_Dec = center_Dec-half_size_Dec, center_Dec+half_size_Dec
+            # return max_RA
+            ra_range = (ra >= min_RA) & (ra <= max_RA)
+            dec_range = (dec >= min_Dec) & (dec <= max_Dec)
+            new_ra = ra[ra_range]
+            new_dec = ra[dec_range]
+            return new_ra, new_dec
+        elif shape == "circle":
+            pass
+        elif shape == "ellipse":
+            pass
+        else:
+            print("Shape must be either \"circle\", \"ellipse\", or \"box\".")
+            return
+
 
 class XMM(Telescope):
     """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on energy (photon intensity).
