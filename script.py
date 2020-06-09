@@ -1,25 +1,28 @@
-from classes import Telescope, Chandra, XMM
+from classes import Telescope, Chandra, XMM, Swift, Rosat
 import numpy as np
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
 
-test = f"{data_dir}/L1517/test.fits"
-test1 = f"{data_dir}/L1517/test1.fits"
-
 chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits"
-
-xmm_sample = f"{data_dir}/B59/XMM/PPS/P0206610101PNS003PIEVLI0000.FTZ"
-
-chandra = Chandra(chandra_sample)
-chandra2 = Chandra(
-    "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data/L1448/Chandra/primary/acisf04497N003_evt2.fits")
-
-# print(chandra.e_mask())
-# print(chandra.coord_mask(6000, 6000, size_RA=100, size_Dec=100, save=True))
-energies = chandra.e_mask()
-energies2 = chandra2.e_mask()
-
-chandra.e_hist(e_list=energies, e_list2=energies2, object="L1448 & L1517")
+xmm_sample = f"{data_dir}/L1517/XMM/PPS/P0101440801M1S001MIEVLI0000.FTZ"
+rosat_sample = f"{data_dir}/L1517/ROSAT/rp201278a01_bas.fits"
+swift_sample = f"{data_dir}/L1517/Swift/xrt/event/sw00034249004xpcw3po_cl.evt.gz"
 
 # xmm = XMM(xmm_sample)
-# print(xmm.file_dir)
+# e_region = xmm.coord_mask(24500, 24600, size_RA=4500,
+#                           size_Dec=4500, newfile=True, filename="test.fits")
+
+# testxmm = XMM(f"{data_dir}/L1517/XMM/PPS/test.fits")
+# testxmm.e_hist([1000, 6000], nbins=100)
+# xmm.e_mask([600, 3000], filename="test2.fits", newfile=True)
+# testxmm.e_mask([600, 2000], filename="test2.fits", newfile=True)
+# testxmm.e_mask([600, 1000], filename="test3.fits", newfile=True)
+# testxmm.e_mask([600, 1000], filename="test4.fits", newfile=True)
+
+# rosat = Rosat(rosat_sample)
+# rosat.coord_mask(7882.0363, 6126.3879, size_RA=2377.7274,
+#                  size_Dec=2350.0797, newfile=True, filename="test.fits")
+
+swift = Swift(swift_sample)
+swift.coord_mask(381.0884, 450.21112, size_RA=504.33036,
+                 size_Dec=498.46605, newfile=True, filename="test2.fits")
