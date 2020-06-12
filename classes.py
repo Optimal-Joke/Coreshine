@@ -4,13 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # data_dir should be a directory containing each object as it's own subdirectory. Objects should have subdirectories for each telescope's data.
-data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Modified Data"
+data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified"
 
-objects = {}
+object_dict = {}
 # Creates dictionary of object names and their directories' file paths.
 for entry in os.scandir(data_dir):
-    if not entry.name.startswith('.') and entry.is_dir():
-        objects[entry.name] = entry.path
+    if entry.is_dir() and not entry.name.startswith('.'):
+        object_dict[entry.name] = entry.path
+objects = list(object_dict.values())
+objects.sort()
 
 
 class Telescope:
@@ -25,11 +27,11 @@ class Telescope:
                     self.file_dir = directory
                     self.filename = file
         # Using self.path, get object name from object dictionary.
-        for item in objects.keys():
+        for item in object_dict.keys():
             if item in self.path:
                 self.objectname = item
         # Get object path from object directory.
-        obj_path = objects[self.objectname]
+        obj_path = object_dict[self.objectname]
         self.telescopes = []
         for telescope in os.scandir(obj_path):
             if telescope.is_dir() and "." not in telescope.name:
