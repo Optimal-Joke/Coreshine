@@ -517,6 +517,7 @@ class Rosat(Telescope):
             plt.close()
         else:
             plt.show()
+        hdul.close()
 
     def e_mask(self, *args, newfile=False, filename=None):
         """If newfile=False, method returns a list of masked energies that fall within the given ranges. Each range should be specifed as a list of length 2. For example, a range of energies from 600-1000eV would be denoted [600, 1000]. The final range may be of length 1 — for example, [1000]. This defaults to a range [1000, infinity].
@@ -562,6 +563,7 @@ class Rosat(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
+        hdul.close()
 
     def coord_mask(self, center_RA, center_Dec, shape="box", size_RA=None, size_Dec=None, radius=None, radius_RA=None, radius_Dec=None, rotation=None, newfile=False, filename=None):
         """Given a set of values describing the shape of a region, this method returns the list of energies within that region, which can then be used for analysis (filter by energy, make a histogram, etc). If newfile=True, a new FITS file will be created from the original, containing only the event data for everything within the region.
@@ -619,6 +621,7 @@ class Rosat(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
+        hdul.close()
 
 
 class Swift(Telescope):
