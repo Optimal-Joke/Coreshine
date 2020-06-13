@@ -90,32 +90,41 @@ class Chandra(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
         """
         if e_list is not None:
             # Use list of energies instead of specified ranges to make histogram
-            e_band = e_list
+            e = e_list
         else:
-            try:  # If a range with a max and min is passed as input
-                min_e, max_e = e_range
-            except ValueError:  # If a range with only a min is passed as input
-                min_e, max_e = e_range, float("inf")
-            except TypeError:  # If no range is passed as input
-                min_e, max_e = 0, float("inf")
-            evt_data = fits.getdata(self.path)  # Get data from event file
-            energy = evt_data["energy"]  # Extract energy data
-            min_thresh = energy >= min_e  # Establish min filter
-            max_thresh = energy < max_e  # Establish max filter
-            # Filter energy for everything between specified min and max values
-            e_band = energy[min_thresh & max_thresh]
-        plt.hist(e_band, bins=nbins)
+            evt_data = fits.getdata(self.path)  # Get event data from file
+            energy = evt_data["energy"]  # Get energy data from event data
+            # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
+            if args:
+                filter_list = [False for i in range(len(energy))]
+                for arg in args:
+                    try:  # If a range with a max and min is passed as input.
+                        min_e, max_e = arg
+                    except ValueError:  # If a range with only a min is passed as input.
+                        min_e, max_e = arg, float("inf")
+                    except TypeError:  # If no range is passed as input.
+                        min_e, max_e = 0, float("inf")
+                    # New filter list with provided range.
+                    r = (energy >= min_e) & (energy < max_e)
+                    # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
+                    for i in range(len(filter_list)):
+                        if r[i] == True:
+                            filter_list[i] = True
+            else:
+                filter_list = [True for i in range(len(energy))]
+            e = energy[filter_list]
+        plt.hist(e, bins=nbins)
         if e_list2 is not None:
             # Overlay second histogram if data is present
             plt.hist(e_list2, bins=nbins)
-        plt.xlabel("Energy (eV)")
+        plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
         if not object:
             plt.title(f"Energy Distribution")
@@ -261,32 +270,41 @@ class XMM(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
         """
         if e_list is not None:
             # Use list of energies instead of specified ranges to make histogram
-            e_band = e_list
+            e = e_list
         else:
-            try:  # If a range with a max and min is passed as input
-                min_e, max_e = e_range
-            except ValueError:  # If a range with only a min is passed as input
-                min_e, max_e = e_range, float("inf")
-            except TypeError:  # If no range is passed as input
-                min_e, max_e = 0, float("inf")
-            evt_data = fits.getdata(self.path)  # Get data from event file
-            energy = evt_data["PI"]  # Extract energy data
-            min_thresh = energy >= min_e  # Establish min filter
-            max_thresh = energy < max_e  # Establish max filter
-            # Filter energy for everything between specified min and max values
-            e_band = energy[min_thresh & max_thresh]
-        plt.hist(e_band, bins=nbins)
+            evt_data = fits.getdata(self.path)  # Get event data from file
+            energy = evt_data["PI"]  # Get energy data from event data
+            # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
+            if args:
+                filter_list = [False for i in range(len(energy))]
+                for arg in args:
+                    try:  # If a range with a max and min is passed as input.
+                        min_e, max_e = arg
+                    except ValueError:  # If a range with only a min is passed as input.
+                        min_e, max_e = arg, float("inf")
+                    except TypeError:  # If no range is passed as input.
+                        min_e, max_e = 0, float("inf")
+                    # New filter list with provided range.
+                    r = (energy >= min_e) & (energy < max_e)
+                    # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
+                    for i in range(len(filter_list)):
+                        if r[i] == True:
+                            filter_list[i] = True
+            else:
+                filter_list = [True for i in range(len(energy))]
+            e = energy[filter_list]
+        plt.hist(e, bins=nbins)
         if e_list2 is not None:
             # Overlay second histogram if data is present
             plt.hist(e_list2, bins=nbins)
-        plt.xlabel("Energy (eV)")
+        plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
         if not object:
             plt.title(
@@ -435,34 +453,42 @@ class Rosat(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
         """
         if e_list is not None:
             # Use list of energies instead of specified ranges to make histogram
-            e_band = e_list
+            e = e_list
         else:
-            try:  # If a range with a max and min is passed as input
-                min_e, max_e = e_range
-            except ValueError:  # If a range with only a min is passed as input
-                min_e, max_e = e_range, float("inf")
-            except TypeError:  # If no range is passed as input
-                min_e, max_e = 0, float("inf")
-            # Open data file
-            hdul = fits.open(self.path, ignore_missing_end=True)
-            evt_data = hdul[2].data  # Get event data from file
-            energy = evt_data["PI"]  # Get energy data from event data
-            min_thresh = energy >= min_e  # Establish min filter
-            max_thresh = energy < max_e  # Establish max filter
-            # Filter energy for everything between specified min and max values
-            e_band = energy[min_thresh & max_thresh]
-        plt.hist(e_band, bins=nbins)
+            hdul = fits.open(self.path)  # Open data file
+            evt_table = hdul[2]  # Get event table from file
+            energy = evt_table.data["PI"]  # Get energy data from event data
+            # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
+            if args:
+                filter_list = [False for i in range(len(energy))]
+                for arg in args:
+                    try:  # If a range with a max and min is passed as input.
+                        min_e, max_e = arg
+                    except ValueError:  # If a range with only a min is passed as input.
+                        min_e, max_e = arg, float("inf")
+                    except TypeError:  # If no range is passed as input.
+                        min_e, max_e = 0, float("inf")
+                    # New filter list with provided range.
+                    r = (energy >= min_e) & (energy < max_e)
+                    # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
+                    for i in range(len(filter_list)):
+                        if r[i] == True:
+                            filter_list[i] = True
+            else:
+                filter_list = [True for i in range(len(energy))]
+            e = energy[filter_list]
+        plt.hist(e, bins=nbins)
         if e_list2 is not None:
             # Overlay second histogram if data is present
             plt.hist(e_list2, bins=nbins)
-        plt.xlabel("Energy (eV)")
+        plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
         if not object:
             plt.title(
@@ -611,32 +637,41 @@ class Swift(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
         """
         if e_list is not None:
             # Use list of energies instead of specified ranges to make histogram
-            e_band = e_list
+            e = e_list
         else:
-            try:  # If a range with a max and min is passed as input
-                min_e, max_e = e_range
-            except ValueError:  # If a range with only a min is passed as input
-                min_e, max_e = e_range, float("inf")
-            except TypeError:  # If no range is passed as input
-                min_e, max_e = 0, float("inf")
-            evt_data = fits.getdata(self.path)  # Get data from event file
-            energy = evt_data["PI"]  # Extract energy data
-            min_thresh = energy >= min_e  # Establish min filter
-            max_thresh = energy < max_e  # Establish max filter
-            # Filter energy for everything between specified min and max values
-            e_band = energy[min_thresh & max_thresh]
-        plt.hist(e_band, bins=nbins)
+            evt_data = fits.getdata(self.path)  # Get event data from file
+            energy = evt_data["PI"]  # Get energy data from event data
+            # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
+            if args:
+                filter_list = [False for i in range(len(energy))]
+                for arg in args:
+                    try:  # If a range with a max and min is passed as input.
+                        min_e, max_e = arg
+                    except ValueError:  # If a range with only a min is passed as input.
+                        min_e, max_e = arg, float("inf")
+                    except TypeError:  # If no range is passed as input.
+                        min_e, max_e = 0, float("inf")
+                    # New filter list with provided range.
+                    r = (energy >= min_e) & (energy < max_e)
+                    # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
+                    for i in range(len(filter_list)):
+                        if r[i] == True:
+                            filter_list[i] = True
+            else:
+                filter_list = [True for i in range(len(energy))]
+            e = energy[filter_list]
+        plt.hist(e, bins=nbins)
         if e_list2 is not None:
             # Overlay second histogram if data is present
             plt.hist(e_list2, bins=nbins)
-        plt.xlabel("Energy (eV)")
+        plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
         if not object:
             plt.title(
