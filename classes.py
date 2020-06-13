@@ -181,9 +181,8 @@ class Chandra(Telescope):
         else:
             with fits.open(self.path) as hdul:
                 evt_table = hdul[1]
-                evt_data = evt_table.data
                 # Use energy filter to filter events.
-                evt_data = evt_data[filter_list]
+                evt_table.data = evt_table.data[filter_list]
                 if filename is None:
                     filename = f"{self.filename}"
                 try:
@@ -362,9 +361,9 @@ class XMM(Telescope):
             return energies  # Return list of filtered energies.
         else:
             with fits.open(self.path) as hdul:
-                evt_data = hdul[1].data
+                evt_table = hdul[1]
                 # Use energy filter to filter events.
-                evt_data = evt_data[filter_list]
+                evt_table.data = evt_table.data[filter_list]
                 if filename is None:
                     filename = f"{self.filename}"
                 try:
@@ -525,8 +524,8 @@ class Rosat(Telescope):
         If newfile=True, a new file will be created that only contains rows with energies within the specified ranges.
         """
         hdul = fits.open(self.path)  # Open data file
-        evt_data = hdul[2].data  # Get event data from file
-        energy = evt_data["PI"]  # Get energy data from event data
+        evt_table = hdul[2]  # Get event table from file
+        energy = evt_table.data["PI"]  # Get energy data from event data
         # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
         filter_list = [False for i in range(len(energy))]
         for arg in args:
@@ -548,9 +547,9 @@ class Rosat(Telescope):
             return energies  # Return list of filtered energies.
         else:
             with fits.open(self.path) as hdul:
-                evt_data = hdul[2].data
+                evt_table = hdul[2]
                 # Use energy filter to filter events.
-                evt_data = evt_data[filter_list]
+                evt_table.data = evt_table.data[filter_list]
                 if filename is None:
                     filename = f"{self.filename}"
                 try:
@@ -732,9 +731,9 @@ class Swift(Telescope):
             return energies  # Return list of filtered energies.
         else:
             with fits.open(self.path) as hdul:
-                evt_data = hdul[1].data
+                evt_table = hdul[1]
                 # Use energy filter to filter events.
-                evt_data = evt_data[filter_list]
+                evt_table.data = evt_table.data[filter_list]
                 if filename is None:
                     filename = f"{self.filename}"
                 try:
