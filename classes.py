@@ -418,7 +418,9 @@ class XMM(Telescope):
 
 
 class Rosat(Telescope):
-    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
+    """FITS.OPEN CURRENTLY BROKEN FOR ROSAT FILES. STILL TRYING TO TROUBLESHOOT.
+
+    Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
     """
 
     def __init__(self, file):
@@ -448,7 +450,8 @@ class Rosat(Telescope):
                 min_e, max_e = e_range, float("inf")
             except TypeError:  # If no range is passed as input
                 min_e, max_e = 0, float("inf")
-            hdul = fits.open(self.path, ignore_missing_end=True)  # Open data file
+            # Open data file
+            hdul = fits.open(self.path, ignore_missing_end=True)
             evt_data = hdul[2].data  # Get event data from file
             energy = evt_data["PI"]  # Get energy data from event data
             min_thresh = energy >= min_e  # Establish min filter
