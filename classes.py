@@ -64,7 +64,7 @@ class Spitzer(Telescope):
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            init_message = f"{self.telescope} data initiated."
+            init_message = f"{self.objectname} {self.telescope} data initiated."
         print(init_message)
 
     def __repr__(self):
@@ -84,7 +84,7 @@ class Chandra(Telescope):
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            init_message = f"{self.telescope} data initiated."
+            init_message = f"{self.objectname} {self.telescope} data initiated."
         print(init_message)
 
     def __repr__(self):
@@ -263,7 +263,7 @@ class XMM(Telescope):
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            init_message = f"{self.telescope} data initiated."
+            init_message = f"{self.objectname} {self.telescope} data initiated."
         print(init_message)
 
     def __repr__(self):
@@ -446,7 +446,7 @@ class Rosat(Telescope):
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            init_message = f"{self.telescope} data initiated."
+            init_message = f"{self.objectname} {self.telescope} data initiated."
         print(init_message)
 
     def __repr__(self):
@@ -461,28 +461,29 @@ class Rosat(Telescope):
             # Use list of energies instead of specified ranges to make histogram
             e = e_list
         else:
-            hdul = fits.open(self.path)  # Open data file
-            evt_table = hdul[2]  # Get event table from file
-            energy = evt_table.data["PI"]  # Get energy data from event data
-            # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
-            if args:
-                filter_list = [False for i in range(len(energy))]
-                for arg in args:
-                    try:  # If a range with a max and min is passed as input.
-                        min_e, max_e = arg
-                    except ValueError:  # If a range with only a min is passed as input.
-                        min_e, max_e = arg, float("inf")
-                    except TypeError:  # If no range is passed as input.
-                        min_e, max_e = 0, float("inf")
-                    # New filter list with provided range.
-                    r = (energy >= min_e) & (energy < max_e)
-                    # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
-                    for i in range(len(filter_list)):
-                        if r[i] == True:
-                            filter_list[i] = True
-            else:
-                filter_list = [True for i in range(len(energy))]
-            e = energy[filter_list]
+            with fits.open(self.path) as hdul:
+                evt_table = hdul[2]  # Get event table from file
+                # Get energy data from event data
+                energy = evt_table.data["PI"]
+                # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
+                if args:
+                    filter_list = [False for i in range(len(energy))]
+                    for arg in args:
+                        try:  # If a range with a max and min is passed as input.
+                            min_e, max_e = arg
+                        except ValueError:  # If a range with only a min is passed as input.
+                            min_e, max_e = arg, float("inf")
+                        except TypeError:  # If no range is passed as input.
+                            min_e, max_e = 0, float("inf")
+                        # New filter list with provided range.
+                        r = (energy >= min_e) & (energy < max_e)
+                        # Iterate through each value of the master filter list. If the corresponding index in the new filter list is True, the value at that same index in master list will change to True.
+                        for i in range(len(filter_list)):
+                            if r[i] == True:
+                                filter_list[i] = True
+                else:
+                    filter_list = [True for i in range(len(energy))]
+                e = energy[filter_list]
         plt.hist(e, bins=nbins)
         if e_list2 is not None:
             # Overlay second histogram if data is present
@@ -516,16 +517,15 @@ class Rosat(Telescope):
             plt.close()
         else:
             plt.show()
-        hdul.close()
 
     def e_mask(self, *args, newfile=False, filename=None):
         """If newfile=False, method returns a list of masked energies that fall within the given ranges. Each range should be specifed as a list of length 2. For example, a range of energies from 600-1000eV would be denoted [600, 1000]. The final range may be of length 1 — for example, [1000]. This defaults to a range [1000, infinity].
 
         If newfile=True, a new file will be created that only contains rows with energies within the specified ranges.
         """
-        hdul = fits.open(self.path)  # Open data file
-        evt_table = hdul[2]  # Get event table from file
-        energy = evt_table.data["PI"]  # Get energy data from event data
+        with fits.open(self.path) as hdul:
+            evt_table = hdul[2]  # Get event table from file
+            energy = evt_table.data["PI"]  # Get energy data from event data
         # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
         filter_list = [False for i in range(len(energy))]
         for arg in args:
@@ -562,7 +562,6 @@ class Rosat(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
-        hdul.close()
 
     def coord_mask(self, center_RA, center_Dec, shape="box", size_RA=None, size_Dec=None, radius=None, radius_RA=None, radius_Dec=None, rotation=None, newfile=False, filename=None):
         """Given a set of values describing the shape of a region, this method returns the list of energies within that region, which can then be used for analysis (filter by energy, make a histogram, etc). If newfile=True, a new FITS file will be created from the original, containing only the event data for everything within the region.
@@ -620,7 +619,6 @@ class Rosat(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
-        hdul.close()
 
 
 class Swift(Telescope):
@@ -633,7 +631,7 @@ class Swift(Telescope):
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
-            init_message = f"{self.telescope} data initiated."
+            init_message = f"{self.objectname} {self.telescope} data initiated."
         print(init_message)
 
     def __repr__(self):
