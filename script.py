@@ -1,5 +1,6 @@
 from classes import Telescope, Chandra, XMM, Swift, Rosat
 import numpy as np
+import glob
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified"
 
@@ -8,23 +9,33 @@ xmm_sample = f"{data_dir}/L1517/XMM/PPS/evt/P0101440801M1S001MIEVLI0000.FTZ"
 rosat_sample = f"{data_dir}/L1517/ROSAT/rp201278a01_bas.fits.Z"
 swift_sample = f"{data_dir}/L1517/Swift/xrt/event/sw00034249004xpcw3po_cl.evt.gz"
 
-# chandra = Chandra(chandra_sample)
-# energies = chandra.coord_mask(
-#     4113.5, 4095.5, size_RA=81, size_Dec=107, newfile=True, filename="test.fits")
-# chandra.e_mask([600, 4000], newfile=True, filename="evt2_f2.fits")
-# chandra.e_hist([1000, 2000], [3000, 4000], nbins=200)
+# Chandra
+evt2 = glob.glob(f"{data_dir}/**/Chandra/**/*evt2.fits*", recursive=True)
 
-# xmm = XMM(xmm_sample)
-# xmm.e_mask([600, 3000], newfile=True, filename="M1_f1.fits")
-# xmm.coord_mask(
-#     24424.714, 24595.563, size_RA=797.04012, size_Dec=1052.8802, newfile=True, filename="test1.fits")
-# xmm.e_hist([600, 1000], [2000], nbins=200)
+# XMM
+mos_1 = glob.glob(f"{data_dir}/**/XMM/PPS/evt/*M1*MIEVLI*.FTZ", recursive=True)
+mos_2 = glob.glob(f"{data_dir}/**/XMM/PPS/evt/*M2*MIEVLI*.FTZ", recursive=True)
+pn = glob.glob(f"{data_dir}/**/XMM/PPS/evt/*PN*PIEVLI*.FTZ", recursive=True)
 
-rosat = Rosat(rosat_sample)
-energies = rosat.e_mask([50, 100], [200])
-rosat.e_hist(e_list=energies)
+# Rosat
+basics = glob.glob(f"{data_dir}/**/ROSAT/*_bas*", recursive=True)
 
-# swift = Swift(swift_sample)
+# Swift
+cleaned_event = glob.glob(
+    f"{data_dir}/**/Swift/xrt/event/sw*po_cl.evt.gz", recursive=True)
+
+# swift = Swift(cleaned_event[0])
 # energies = swift.coord_mask(
-#     532.43458, 501.10731, size_RA=168.60103, size_Dec=162.92732, newfile=True, filename="test.fits")
-# swift.e_hist([20, 100], [150], nbins=100)
+#     446.90694, 487.76449, size_RA=137.97797, size_Dec=139.31756)
+# energies = swift.e_mask(newfile=False, filename="cl_evt_f1.fits")
+# swift.e_hist(e_list=energies, nbins=150)
+
+
+# for file in pn:
+#     xmm = XMM(file)
+#     xmm.e_mask([0,12000], newfile=True, filename="PN_PIEVLI_f1.fits")
+
+xmm_object = XMM(
+    "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified/L1517/XMM/PPS/evt/P0109270401M1S001MIEVLI0000.ftz")
+xmm_object.e_mask([600, 1500], newfile=True, filename="test.fits")
+# xmm_object.e_hist(e_list=energies)

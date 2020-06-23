@@ -2,6 +2,8 @@ import os
 from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
+import skimage
+from ctypes import CDLL, POINTER, c_int32
 
 # data_dir should be a directory containing each object as it's own subdirectory. Objects should have subdirectories for each telescope's data.
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified"
@@ -31,12 +33,15 @@ class Telescope:
             if item in self.path:
                 self.objectname = item
         # Get object path from object directory.
-        obj_path = object_dict[self.objectname]
-        self.telescopes = []
-        for telescope in os.scandir(obj_path):
-            if telescope.is_dir() and "." not in telescope.name:
-                # List telescopes with object data.
-                self.telescopes.append(telescope.name)
+        try:
+            obj_path = object_dict[self.objectname]
+            self.telescopes = []
+            for telescope in os.scandir(obj_path):
+                if telescope.is_dir() and "." not in telescope.name:
+                    # List telescopes with object data.
+                    self.telescopes.append(telescope.name)
+        except AttributeError:
+            print("Please arrange your filesystem as described above.")
 
     def get_objectname(self):
         """Returns the name of the object.
@@ -79,8 +84,9 @@ class Chandra(Telescope):
     """
 
     def __init__(self, file):
-        self.telescope = "Chandra"
         super().__init__(file)
+        self.telescope = "Chandra"
+        self.evt_data = fits.getdata(self.path)  # Get event data from file
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
@@ -99,8 +105,7 @@ class Chandra(Telescope):
             # Use list of energies instead of specified ranges to make histogram
             e = e_list
         else:
-            evt_data = fits.getdata(self.path)  # Get event data from file
-            energy = evt_data["energy"]  # Get energy data from event data
+            energy = self.evt_data["energy"]  # Get energy data from event data
             # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
             if args:
                 filter_list = [False for i in range(len(energy))]
@@ -157,8 +162,7 @@ class Chandra(Telescope):
 
         If newfile=True, a new file will be created that only contains rows with energies within the specified ranges.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        energy = evt_data["energy"]  # Get energy data from event data
+        energy = self.evt_data["energy"]  # Get energy data from event data
         # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
         filter_list = [False for i in range(len(energy))]
         for arg in args:
@@ -203,9 +207,8 @@ class Chandra(Telescope):
 
         This method was designed with reference to the application "SAOImage ds9" and its ability to overlay regions on a given image. Once a region is created and selected, go to Region->Get Information to view its size parameters. Change the units to "detector," and those numbers may be used as input for this method.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        ra = evt_data["x"]  # Get RA coordinates from event data
-        dec = evt_data["y"]  # Get Dec coordinates from event data
+        ra = self.evt_data["x"]  # Get RA coordinates from event data
+        dec = self.evt_data["y"]  # Get Dec coordinates from event data
         # Create True boolean filter list the length of the coordinate data. This will be referenced and altered by each successive coordinate filter (ra_range and dec_range).
         filter_list = [True for i in range(len(ra))]
         if shape == "box":
@@ -252,14 +255,27 @@ class Chandra(Telescope):
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
 
+    def halo(self):
+        # Cname = "fuzzyhough_notxt"
+        # Cpath = "/Users/hunterholland/Documents/Research/Laidlaw/Pipelines/Xray-Scattering-Halos/fuzzyhough_notxt.c"
+
+        # os.system(
+        #     f'pwd; gcc -c -fPIC -lm {Cname}.c -o {Cname}.o; gcc {Cname}.o -shared -o {Cname}.so')
+        # halo_object = CDLL(f'{filepath}{filename}.so')
+        pass
+        # ras = np.array(self.evt_data["x"])  # Get RA coordinates from event data
+        # decs = np.array(self.evt_data["y"])  # Get Dec coordinates from event data
+        # photonCount = len(ras)
+
 
 class XMM(Telescope):
     """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
     """
 
     def __init__(self, file):
-        self.telescope = "XMM"
         super().__init__(file)
+        self.telescope = "XMM"
+        self.evt_data = fits.getdata(self.path)  # Get event data from file
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
@@ -278,8 +294,7 @@ class XMM(Telescope):
             # Use list of energies instead of specified ranges to make histogram
             e = e_list
         else:
-            evt_data = fits.getdata(self.path)  # Get event data from file
-            energy = evt_data["PI"]  # Get energy data from event data
+            energy = self.evt_data["PI"]  # Get energy data from event data
             # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
             if args:
                 filter_list = [False for i in range(len(energy))]
@@ -338,8 +353,7 @@ class XMM(Telescope):
 
         If newfile=True, a new file will be created that only contains rows with energies within the specified ranges.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        energy = evt_data["PI"]  # Get energy data from event data
+        energy = self.evt_data["PI"]  # Get energy data from event data
         # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
         filter_list = [False for i in range(len(energy))]
         for arg in args:
@@ -384,9 +398,8 @@ class XMM(Telescope):
 
         This method was designed with reference to the application "SAOImage ds9" and its ability to overlay regions on a given image. Once a region is created and selected, go to Region->Get Information to view its size parameters. Change the units to "detector," and those numbers may be used as input for this method.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        ra = evt_data["X"]  # Get RA coordinates from event data
-        dec = evt_data["Y"]  # Get Dec coordinates from event data
+        ra = self.evt_data["X"]  # Get RA coordinates from event data
+        dec = self.evt_data["Y"]  # Get Dec coordinates from event data
         # Create True boolean filter list the length of the coordinate data. This will be referenced and altered by each successive coordinate filter (ra_range and dec_range).
         filter_list = [True for i in range(len(ra))]
         if shape == "box":
@@ -626,8 +639,9 @@ class Swift(Telescope):
     """
 
     def __init__(self, file):
-        self.telescope = "Swift"
         super().__init__(file)
+        self.telescope = "Swift"
+        self.evt_data = fits.getdata(self.path)  # Get event data from file
         if not self.telescope in self.telescopes:
             init_message = f"{self.objectname} has no data from {self.telescope} telescope."
         else:
@@ -646,8 +660,7 @@ class Swift(Telescope):
             # Use list of energies instead of specified ranges to make histogram
             e = e_list
         else:
-            evt_data = fits.getdata(self.path)  # Get event data from file
-            energy = evt_data["PI"]  # Get energy data from event data
+            energy = self.evt_data["PI"]  # Get energy data from event data
             # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
             if args:
                 filter_list = [False for i in range(len(energy))]
@@ -706,8 +719,7 @@ class Swift(Telescope):
 
         If newfile=True, a new file will be created that only contains rows with energies within the specified ranges.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        energy = evt_data["PI"]  # Get energy data from event data
+        energy = self.evt_data["PI"]  # Get energy data from event data
         # Create False boolean filter list based on the energy data. This master list will be referenced and altered by each range passed as input.
         filter_list = [False for i in range(len(energy))]
         for arg in args:
@@ -752,9 +764,8 @@ class Swift(Telescope):
 
         This method was designed with reference to the application "SAOImage ds9" and its ability to overlay regions on a given image. Once a region is created and selected, go to Region->Get Information to view its size parameters. Change the units to "detector," and those numbers may be used as input for this method.
         """
-        evt_data = fits.getdata(self.path)  # Get event data from file
-        ra = evt_data["x"]  # Get RA coordinates from event data
-        dec = evt_data["y"]  # Get Dec coordinates from event data
+        ra = self.evt_data["x"]  # Get RA coordinates from event data
+        dec = self.evt_data["y"]  # Get Dec coordinates from event data
         # Create True boolean filter list the length of the coordinate data. This will be referenced and altered by each successive coordinate filter (ra_range and dec_range).
         filter_list = [True for i in range(len(ra))]
         if shape == "box":
