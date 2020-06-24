@@ -23,19 +23,3 @@ basics = glob.glob(f"{data_dir}/**/ROSAT/*_bas*", recursive=True)
 # Swift
 cleaned_event = glob.glob(
     f"{data_dir}/**/Swift/xrt/event/sw*po_cl.evt.gz", recursive=True)
-
-# swift = Swift(cleaned_event[0])
-# energies = swift.coord_mask(
-#     446.90694, 487.76449, size_RA=137.97797, size_Dec=139.31756)
-# energies = swift.e_mask(newfile=False, filename="cl_evt_f1.fits")
-# swift.e_hist(e_list=energies, nbins=150)
-
-
-# for file in pn:
-#     xmm = XMM(file)
-#     xmm.e_mask([0,12000], newfile=True, filename="PN_PIEVLI_f1.fits")
-
-xmm_object = XMM(
-    "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified/L1517/XMM/PPS/evt/P0109270401M1S001MIEVLI0000.ftz")
-xmm_object.e_mask([600, 1500], newfile=True, filename="test.fits")
-# xmm_object.e_hist(e_list=energies)
