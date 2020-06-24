@@ -4,7 +4,7 @@ import glob
 
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified"
 
-chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits"
+chandra_sample = f"{data_dir}/L1517/Chandra/primary/acisf03755N004_evt2.fits.gz"
 xmm_sample = f"{data_dir}/L1517/XMM/PPS/evt/P0101440801M1S001MIEVLI0000.FTZ"
 rosat_sample = f"{data_dir}/L1517/ROSAT/rp201278a01_bas.fits.Z"
 swift_sample = f"{data_dir}/L1517/Swift/xrt/event/sw00034249004xpcw3po_cl.evt.gz"
@@ -23,3 +23,6 @@ basics = glob.glob(f"{data_dir}/**/ROSAT/*_bas*", recursive=True)
 # Swift
 cleaned_event = glob.glob(
     f"{data_dir}/**/Swift/xrt/event/sw*po_cl.evt.gz", recursive=True)
+
+rosat = Rosat(rosat_sample)
+rosat.e_hist()

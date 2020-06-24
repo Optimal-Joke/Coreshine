@@ -2,7 +2,6 @@ import os
 from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
-import skimage
 from ctypes import CDLL, POINTER, c_int32
 
 # data_dir should be a directory containing each object as it's own subdirectory. Objects should have subdirectories for each telescope's data.
@@ -26,22 +25,26 @@ class Telescope:
             for directory, _subdir, files in os.walk(f"{data_dir}"):
                 if file in files:
                     self.path = os.path.join(directory, file)
-                    self.file_dir = directory
-                    self.filename = file
-        # Using self.path, get object name from object dictionary.
-        for item in object_dict.keys():
-            if item in self.path:
-                self.objectname = item
-        # Get object path from object directory.
-        try:
-            obj_path = object_dict[self.objectname]
-            self.telescopes = []
-            for telescope in os.scandir(obj_path):
-                if telescope.is_dir() and "." not in telescope.name:
-                    # List telescopes with object data.
-                    self.telescopes.append(telescope.name)
-        except AttributeError:
-            print("Please arrange your filesystem as described above.")
+                    self.file_dir, self.filename = directory, file
+        if data_dir in self.path:
+            # Using self.path, get object name from object dictionary.
+            for item in object_dict.keys():
+                if item in self.path:
+                    self.objectname = item
+                    break
+            # Get object path from object directory.
+            try:
+                obj_path = object_dict[self.objectname]
+                self.telescopes = []
+                for telescope in os.scandir(obj_path):
+                    if telescope.is_dir() and "." not in telescope.name:
+                        # List telescopes with object data.
+                        self.telescopes.append(telescope.name)
+            except AttributeError:
+                print("Please arrange your filesystem as described above.")
+        else:
+            self.objectname = "File is not of an identifiable object."
+            self.telescopes = "Object has no identifiable telescopes with data of it."
 
     def get_objectname(self):
         """Returns the name of the object.
