@@ -83,7 +83,7 @@ class Spitzer(Telescope):
 
 
 class Chandra(Telescope):
-    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
+    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and region.
     """
 
     def __init__(self, file):
@@ -272,7 +272,7 @@ class Chandra(Telescope):
 
 
 class XMM(Telescope):
-    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
+    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and region.
     """
 
     def __init__(self, file):
@@ -453,7 +453,7 @@ class XMM(Telescope):
 class Rosat(Telescope):
     """FITS.OPEN CURRENTLY BROKEN FOR ROSAT FILES. STILL TRYING TO TROUBLESHOOT.
 
-    Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
+    Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and region.
     """
 
     def __init__(self, file):
@@ -638,7 +638,7 @@ class Rosat(Telescope):
 
 
 class Swift(Telescope):
-    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and position.
+    """Takes a file path or name as input. As of now, this class can initiate data, yield energy histograms, and filter files based on photon intensity (energy) and region.
     """
 
     def __init__(self, file):
