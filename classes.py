@@ -99,7 +99,7 @@ class Chandra(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, *args, e_range=None, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_range=None, e_list=None, e_list2=None, nbins='auto', is_object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
@@ -134,12 +134,12 @@ class Chandra(Telescope):
             plt.hist(e_list2, bins=nbins)
         plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
-        if not object:
+        if not is_object:
             plt.title(f"Energy Distribution")
-        elif object:
-            plt.title(f"{object} Energy Distribution")
+        elif is_object:
+            plt.title(f"{is_object} Energy Distribution")
         if save == True:
-            if object:
+            if is_object:
                 if filename is None:
                     plt.savefig(f"{self.file_dir}/ehist.png",
                                 dpi=250, format="png")
@@ -288,7 +288,7 @@ class XMM(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', is_object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
@@ -323,14 +323,14 @@ class XMM(Telescope):
             plt.hist(e_list2, bins=nbins)
         plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
-        if not object:
+        if not is_object:
             plt.title(
                 f"Energy Distribution")
-        elif object:
+        elif is_object:
             plt.title(
-                f"{object} Energy Distribution")
+                f"{is_object} Energy Distribution")
         if save == True:
-            if object:
+            if is_object:
                 if filename is None:
                     plt.savefig(
                         f"{self.file_dir}/ehist.png", dpi=250, format="png")
@@ -468,7 +468,7 @@ class Rosat(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', is_object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
@@ -506,14 +506,14 @@ class Rosat(Telescope):
             plt.hist(e_list2, bins=nbins)
         plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
-        if not object:
+        if not is_object:
             plt.title(
                 f"Energy Distribution")
-        elif object:
+        elif is_object:
             plt.title(
-                f"{object} Energy Distribution")
+                f"{is_object} Energy Distribution")
         if save == True:
-            if object:
+            if is_object:
                 if filename is None:
                     plt.savefig(
                         f"{self.file_dir}/ehist.png", dpi=250, format="png")
@@ -654,7 +654,7 @@ class Swift(Telescope):
     def __repr__(self):
         return f"{self.telescope} object from path {self.path}"
 
-    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', object=False, save=False, filename=None):
+    def e_hist(self, *args, e_list=None, e_list2=None, nbins='auto', is_object=False, save=False, filename=None):
         """Makes a histogram over the specified energy range or, optionally, of up to two lists of energies passed as input. Optionally saves output as PNG active file's directory.
 
         To specify an energy range from a minimum energy A to a maximum energy B, use list notation: [A, B].
@@ -689,14 +689,14 @@ class Swift(Telescope):
             plt.hist(e_list2, bins=nbins)
         plt.xlabel("Energy [eV]")
         plt.ylabel("Count")
-        if not object:
+        if not is_object:
             plt.title(
                 f"Energy Distribution")
-        elif object:
+        elif is_object:
             plt.title(
-                f"{object} Energy Distribution")
+                f"{is_object} Energy Distribution")
         if save == True:
-            if object:
+            if is_object:
                 if filename is None:
                     plt.savefig(
                         f"{self.file_dir}/ehist.png", dpi=250, format="png")
