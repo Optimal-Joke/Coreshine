@@ -1,8 +1,8 @@
 import os
+import time
 from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
-from ctypes import CDLL, POINTER, c_int32
 
 # data_dir should be a directory containing each object as it's own subdirectory. Objects should have subdirectories for each telescope's data.
 data_dir = "/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified"
@@ -257,18 +257,6 @@ class Chandra(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
-
-    def halo(self):
-        # Cname = "fuzzyhough_notxt"
-        # Cpath = "/Users/hunterholland/Documents/Research/Laidlaw/Pipelines/Xray-Scattering-Halos/fuzzyhough_notxt.c"
-
-        # os.system(
-        #     f'pwd; gcc -c -fPIC -lm {Cname}.c -o {Cname}.o; gcc {Cname}.o -shared -o {Cname}.so')
-        # halo_object = CDLL(f'{filepath}{filename}.so')
-        pass
-        # ras = np.array(self.evt_data["x"])  # Get RA coordinates from event data
-        # decs = np.array(self.evt_data["y"])  # Get Dec coordinates from event data
-        # photonCount = len(ras)
 
 
 class XMM(Telescope):
@@ -760,6 +748,28 @@ class Swift(Telescope):
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
 
+    def filter_energy(self, *e_ranges: tuple, newfile="filtered_energy.fits"):
+        """Energy ranges should be input as tuples. For example, a range from 100-400ev would be
+        represented as (100,400), and ranges from 100-400eV, 500-900ev, and 1000-2000eV would be
+        represented as (100,400), (500,900), (1000,2000).
+
+        You can optionally get all energies greater than a value by passing it as a 1-tuple after
+        at least 1 other tuple. For example, a range from 100-400ev and everything above 1000ev
+        would be represented as (100,400), (1000,).
+        """
+
+        energies = self.evt_data["PI"]
+
+        filtered_energies = np.array([])
+        for e_range in e_ranges:
+            try:  # get events in a range of energies
+                sub_energies = energies[(energies > e_range[0]) & (energies < e_range[1])]
+            except IndexError:
+                if len(e_ranges) > 1:  # get all events above the last energy given
+                    sub_energies = np.where(energies > e_range)
+            filtered_energies = np.append(filtered_energies, sub_energies)
+        print(filtered_energies)
+
     def coord_mask(self, center_RA, center_Dec, shape="box", size_RA=None, size_Dec=None, radius=None, radius_RA=None, radius_Dec=None, rotation=None, newfile=False, filename=None):
         """Given a set of values describing the shape of a region, this method returns the list of energies within that region, which can then be used for analysis (filter by energy, make a histogram, etc). If newfile=True, a new FITS file will be created from the original, containing only the event data for everything within the region.
 
@@ -814,3 +824,7 @@ class Swift(Telescope):
                 except OSError:
                     print(
                         f"""A file with the name {filename} already exists in {self.file_dir}\nPlease use the \"filename\" parameter to give it another name""")
+
+
+test = Swift("/Users/hunterholland/Documents/Research/Laidlaw/Data/Modified/L1517/Swift/xrt/event/sw00034249004xpcw3po_cl.evt.gz")
+test.filter_energy((100, 400), (500, 900), (1000, 2000), (3000,))
